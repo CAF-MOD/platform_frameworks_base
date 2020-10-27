@@ -189,7 +189,7 @@ public class DisplayRotation {
     private static final int CAMERA_ROTATION_DISABLED = 0;
     private static final int CAMERA_ROTATION_ENABLED = 1;
     private int mCameraRotationMode = CAMERA_ROTATION_DISABLED;
-
+    
     /**
      * Flag that indicates this is a display that may run better when fixed to user rotation.
      */
@@ -893,7 +893,7 @@ public class DisplayRotation {
         if (!isDefaultDisplay) {
             return mUserRotationMode == WindowManagerPolicy.USER_ROTATION_LOCKED;
         }
-
+    
         return Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.ACCELEROMETER_ROTATION, 0, UserHandle.USER_CURRENT) == 0;
     }
@@ -1464,7 +1464,6 @@ public class DisplayRotation {
                 mUserRotation = userRotation;
                 shouldUpdateRotation = true;
             }
-
             final int userRotationMode = Settings.System.getIntForUser(resolver,
                     Settings.System.ACCELEROMETER_ROTATION, 0, UserHandle.USER_CURRENT) != 0
                             ? WindowManagerPolicy.USER_ROTATION_FREE
@@ -1622,7 +1621,6 @@ public class DisplayRotation {
             resolver.registerContentObserver(
                     Settings.Secure.getUriFor(Settings.Secure.CAMERA_AUTOROTATE), false, this,
                     UserHandle.USER_ALL);
-
             updateSettings();
         }
 

@@ -59,6 +59,7 @@ import com.android.systemui.statusbar.phone.LockscreenGestureLogger.LockscreenUi
 import com.android.systemui.statusbar.policy.KeyguardStateController;
 import com.android.wm.shell.animation.FlingAnimationUtils;
 
+import android.os.SystemProperties;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;

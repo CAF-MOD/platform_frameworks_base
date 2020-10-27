@@ -34,6 +34,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PersistableBundle;
+import android.os.Process;
 import android.util.ArrayMap;
 import android.util.Log;
 
@@ -49,6 +50,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.Executor;
+
+import com.android.internal.baikalos.BaikalSettings;
 
 /**
  * The AudioTrack class manages and plays a single audio resource for Java applications.
@@ -755,7 +758,17 @@ public class AudioTrack extends PlayerBase
         super(attributes, AudioPlaybackConfiguration.PLAYER_TYPE_JAM_AUDIOTRACK);
         // mState already == STATE_UNINITIALIZED
 
-        mConfiguredAudioAttributes = attributes; // object copy not needed, immutable.
+        boolean baikalForceSonification = BaikalSettings.getForceSonification(Process.myUid());
+
+        if( baikalForceSonification ) {
+            mAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build();
+            mConfiguredAudioAttributes = mAttributes;
+        } else {
+            mConfiguredAudioAttributes = attributes; // object copy not needed, immutable.
+        }
 
         if (format == null) {
             throw new IllegalArgumentException("Illegal null AudioFormat");
@@ -1052,7 +1065,16 @@ public class AudioTrack extends PlayerBase
                 throw new IllegalArgumentException("Illegal null AudioAttributes argument");
             }
             // keep reference, we only copy the data when building
-            mAttributes = attributes;
+
+            boolean baikalForceSonification = BaikalSettings.getForceSonification(Process.myUid());
+            if( baikalForceSonification ) {
+                mAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+            } else {
+                mAttributes = attributes;
+            }
             return this;
         }
 
@@ -1236,9 +1258,20 @@ public class AudioTrack extends PlayerBase
          */
         public @NonNull AudioTrack build() throws UnsupportedOperationException {
             if (mAttributes == null) {
-                mAttributes = new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build();
+
+                boolean baikalForceSonification = BaikalSettings.getForceSonification(Process.myUid());
+                if( baikalForceSonification ) {
+                    Log.i(TAG,"Forced Sonification usage=USAGE_NOTIFICATION");
+                    mAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build();
+                } else {
+                    mAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build();
+                    Log.i(TAG,"usage=USAGE_MEDIA");
+                }
             }
             switch (mPerformanceMode) {
             case PERFORMANCE_MODE_LOW_LATENCY:

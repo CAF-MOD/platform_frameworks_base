@@ -24,6 +24,7 @@ import android.content.pm.ApplicationInfo;
 import android.net.Credentials;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
+import android.os.Build;
 import android.os.FactoryTest;
 import android.os.IVold;
 import android.os.Process;
@@ -46,6 +47,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import com.android.internal.baikalos.AppProfile;
+import com.android.internal.baikalos.AppProfileSettings;
+import com.android.internal.baikalos.AppProfileManager;
+
+import com.android.internal.baikalos.BaikalSpoofer;
+import com.android.internal.baikalos.SpoofDeviceInfo;
 
 /** @hide */
 public final class Zygote {
@@ -286,6 +294,9 @@ public final class Zygote {
      * @hide for internal use only
      */
     public static final String USAP_POOL_SECONDARY_SOCKET_NAME = "usap_pool_secondary";
+
+    private static final boolean PRODUCT_NEEDS_MODEL_EDIT =
+            SystemProperties.getBoolean("ro.product.needs_model_edit", false);
 
     private Zygote() {}
 
@@ -877,6 +888,79 @@ public final class Zygote {
 
     private static native void nativeBoostUsapPriority();
 
+    public static void setBuildField(String loggingTag, String key, String value) {
+        /*
+         * This would be much prettier if we just removed "final" from the Build fields,
+         * but that requires changing the API.
+         *
+         * While this an awful hack, it's technically safe because the fields are
+         * populated at runtime.
+         */
+        try {
+            // Unlock
+            Field field = Build.class.getDeclaredField(key);
+            field.setAccessible(true);
+
+            // Edit
+            field.set(null, value);
+
+            // Lock
+            field.setAccessible(false);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Log.e(loggingTag, "Failed to spoof Build." + key, e);
+        }
+    }
+
+    private static void maybeSpoofBuild(String packageName, String loggingTag) {
+        // Set device model to defy NGA in Google Assistant
+        if (PRODUCT_NEEDS_MODEL_EDIT &&
+                packageName != null &&
+                packageName.startsWith("com.google.android.googlequicksearchbox")) {
+            /*
+             * This would be much prettier if we just removed "final" from the MODEL field in Build,
+             * but that requires changing the API.
+             *
+             * While this an awful hack, it's technically safe because the field was populated at
+             * runtime (in pre-fork Zygote) and it's not a primitive.
+             */
+            try {
+                // Unlock
+                Field field = Build.class.getDeclaredField("MODEL");
+                field.setAccessible(true);
+
+                // Edit
+                String newModel = "Pixel 3 XL";
+                field.set(null, newModel);
+
+                // Lock
+                field.setAccessible(false);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                Log.w(loggingTag, "Failed to set fake model name for Google", e);
+            }
+        }
+    }
+
+    private static void maybeSpoofDevice(String packageName, String loggingTag) {
+
+        if( packageName == null ) return;
+        try {
+            String val = SystemProperties.get("b.spf." + packageName,"0");
+            Log.e(loggingTag, "Spoof Device Profile :" + packageName);
+            Log.e(loggingTag, "Spoof Device :" + val);
+
+            int device_id = Integer.parseInt(val) - 1;
+            if( device_id < 0 ) return;
+
+            SpoofDeviceInfo device = BaikalSpoofer.Devices[device_id];
+            setBuildField(loggingTag, "MODEL", device.deviceModel);
+            setBuildField(loggingTag, "MANUFACTURER", device.deviceManufacturer);
+            //setBuildField(loggingTag, "NAME", device.deviceName);
+        } catch(Exception e) {
+            Log.e(loggingTag, "Failed to spoof Device :" + packageName, e);
+        }
+        
+    }
+
     static void setAppProcessName(ZygoteArguments args, String loggingTag) {
         if (args.mNiceName != null) {
             Process.setArgV0(args.mNiceName);
@@ -885,6 +969,10 @@ public final class Zygote {
         } else {
             Log.w(loggingTag, "Unable to set package name.");
         }
+        // Set pixel props
+
+        maybeSpoofBuild(args.mPackageName, loggingTag);
+        maybeSpoofDevice(args.mPackageName, loggingTag);
     }
 
     private static final String USAP_ERROR_PREFIX = "Invalid command to USAP: ";

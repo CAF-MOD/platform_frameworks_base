@@ -99,7 +99,7 @@ import android.util.proto.ProtoOutputStream;
 import android.view.Display;
 import android.view.DisplayInfo;
 import android.view.KeyEvent;
-
+import com.android.internal.baikalos.BaikalSettings;
 import com.android.internal.annotations.GuardedBy;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.app.IAppOpsService;
@@ -3427,6 +3427,7 @@ public final class PowerManagerService extends SystemService
             return DisplayPowerRequest.POLICY_BRIGHT;
         }
 
+        if (DEBUG_SPEW) Slog.d(TAG, "getDesiredScreenPolicyLocked: POLICY_DIM");
         return DisplayPowerRequest.POLICY_DIM;
     }
 
@@ -5765,6 +5766,13 @@ public final class PowerManagerService extends SystemService
 
         @Override // Binder call
         public boolean isDeviceIdleMode() {
+
+            final int uid = Binder.getCallingUid();
+
+            if( BaikalSettings.getHideGmsEnabled() && 
+                com.android.internal.baikalos.Runtime.isGmsUid(uid) ) {
+                return false;
+            }
             final long ident = Binder.clearCallingIdentity();
             try {
                 return isDeviceIdleModeInternal();
@@ -5775,6 +5783,13 @@ public final class PowerManagerService extends SystemService
 
         @Override // Binder call
         public boolean isLightDeviceIdleMode() {
+
+            final int uid = Binder.getCallingUid();
+
+            if( BaikalSettings.getHideGmsEnabled() && 
+                com.android.internal.baikalos.Runtime.isGmsUid(uid) ) {
+                return false;
+            }
             final long ident = Binder.clearCallingIdentity();
             try {
                 return isLightDeviceIdleModeInternal();

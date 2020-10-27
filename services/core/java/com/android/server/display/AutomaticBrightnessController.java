@@ -41,7 +41,6 @@ import android.util.EventLog;
 import android.util.MathUtils;
 import android.util.Slog;
 import android.util.TimeUtils;
-
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.display.BrightnessSynchronizer;
 import com.android.internal.os.BackgroundThread;
@@ -323,7 +322,7 @@ class AutomaticBrightnessController {
         // switch to a wake-up light sensor instead but for now we will simply disable the sensor
         // and hold onto the last computed screen auto brightness.  We save the dozing flag for
         // debugging purposes.
-        boolean dozing = (displayPolicy == DisplayPowerRequest.POLICY_DOZE);
+        boolean dozing =  (displayPolicy == DisplayPowerRequest.POLICY_DOZE);
         boolean changed = setBrightnessConfiguration(configuration);
         changed |= setDisplayPolicy(displayPolicy);
         if (userChangedAutoBrightnessAdjustment) {
@@ -485,7 +484,7 @@ class AutomaticBrightnessController {
         if (enable) {
             if (!mLightSensorEnabled) {
                 mLightSensorEnabled = true;
-                mLightSensorEnableTime = SystemClock.uptimeMillis();
+                mLightSensorEnableTime = SystemClock.elapsedRealtime();
                 mCurrentLightSensorRate = mInitialLightSensorRate;
                 registerForegroundAppUpdater();
                 mSensorManager.registerListener(mLightSensorListener, mLightSensor,
@@ -660,7 +659,7 @@ class AutomaticBrightnessController {
     }
 
     private void updateAmbientLux() {
-        long time = SystemClock.uptimeMillis();
+        long time = SystemClock.elapsedRealtime();
         mAmbientLightRingBuffer.prune(time - mAmbientLightHorizon);
         updateAmbientLux(time);
     }
@@ -948,7 +947,7 @@ class AutomaticBrightnessController {
         @Override
         public void onSensorChanged(SensorEvent event) {
             if (mLightSensorEnabled) {
-                final long time = SystemClock.uptimeMillis();
+                final long time = SystemClock.elapsedRealtime();
                 final float lux = event.values[0];
                 handleLightSensorEvent(time, lux);
             }
@@ -1085,7 +1084,7 @@ class AutomaticBrightnessController {
             StringBuilder buf = new StringBuilder();
             buf.append('[');
             for (int i = 0; i < mCount; i++) {
-                final long next = i + 1 < mCount ? getTime(i + 1) : SystemClock.uptimeMillis();
+                final long next = i + 1 < mCount ? getTime(i + 1) : SystemClock.elapsedRealtime();
                 if (i != 0) {
                     buf.append(", ");
                 }

@@ -39,6 +39,7 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.provider.Settings;
 import android.view.ViewStub;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -157,7 +158,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private ContentResolver mContentResolver;
 
     private SignalCallback mSignalCallback = new SignalCallback() {
-        @Override
+         @Override
         public void setIsAirplaneMode(NetworkController.IconState icon) {
             mCommandQueue.recomputeDisableFlags(getContext().getDisplayId(), true /* animate */);
         }

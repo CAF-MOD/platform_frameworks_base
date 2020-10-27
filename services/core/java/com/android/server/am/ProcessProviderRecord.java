@@ -34,12 +34,12 @@ final class ProcessProviderRecord {
     /**
      * The last time someone else was using a provider in this process.
      */
-    private long mLastProviderTime;
+    long mLastProviderTime;
 
     /**
      * class (String) -> ContentProviderRecord.
      */
-    private final ArrayMap<String, ContentProviderRecord> mPubProviders = new ArrayMap<>();
+    final ArrayMap<String, ContentProviderRecord> mPubProviders = new ArrayMap<>();
 
     /**
      * All ContentProviderRecord process is using.

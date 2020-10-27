@@ -1653,7 +1653,7 @@ public class MediaPlayer extends PlayerBase
         boolean washeld = false;
 
         /* Disable persistant wakelocks in media player based on property */
-        if (SystemProperties.getBoolean("audio.offload.ignore_setawake", false) == true) {
+        if (SystemProperties.getBoolean("persist.audio.offload.suspend", false) == true) {
             Log.w(TAG, "IGNORING setWakeMode " + mode);
             return;
         }
@@ -5794,7 +5794,7 @@ public class MediaPlayer extends PlayerBase
         private HandlerThread mHandlerThread;
 
         /** @hide */
-        public boolean DEBUG = false;
+        public boolean DEBUG = true;
 
         public TimeProvider(MediaPlayer mp) {
             mPlayer = mp;

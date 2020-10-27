@@ -116,6 +116,8 @@ import com.android.server.utils.quota.Categorizer;
 import com.android.server.utils.quota.Category;
 import com.android.server.utils.quota.CountQuotaTracker;
 
+import com.android.server.BaikalStaticService;
+
 import libcore.util.EmptyArray;
 
 import java.io.FileDescriptor;
@@ -1044,7 +1046,10 @@ public class JobSchedulerService extends com.android.server.SystemService
 
     public int scheduleAsPackage(JobInfo job, JobWorkItem work, int uId, String packageName,
             int userId, String tag) {
-        // Rate limit excessive schedule() calls.
+        //if( BaikalStaticService.isJobBlacklisted(job,work,uId,packageName,userId,tag) ) {
+            //return JobScheduler.RESULT_FAILURE;
+        //}
+
         final String servicePkg = job.getService().getPackageName();
         if (job.isPersisted() && (packageName == null || packageName.equals(servicePkg))) {
             // Only limit schedule calls for persisted jobs scheduled by the app itself.

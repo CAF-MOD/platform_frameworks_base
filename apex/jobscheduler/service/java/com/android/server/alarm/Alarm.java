@@ -83,19 +83,19 @@ class Alarm {
      */
     static final int EXACT_ALLOW_REASON_COMPAT = 2;
 
-    public final int type;
+    public int type;
     /**
      * The original trigger time supplied by the caller. This can be in the elapsed or rtc time base
      * depending on the type of this alarm
      */
     public final long origWhen;
-    public final boolean wakeup;
+    public boolean wakeup;
     public final PendingIntent operation;
     public final IAlarmListener listener;
     public final String listenerTag;
     public final String statsTag;
     public final WorkSource workSource;
-    public final int flags;
+    public int flags;
     public final AlarmManager.AlarmClockInfo alarmClock;
     public final int uid;
     public final int creatorUid;

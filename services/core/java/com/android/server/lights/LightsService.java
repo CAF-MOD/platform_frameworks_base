@@ -54,7 +54,7 @@ import java.util.function.Supplier;
 
 public class LightsService extends SystemService {
     static final String TAG = "LightsService";
-    static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
     private final LightImpl[] mLightsByType = new LightImpl[LightsManager.LIGHT_ID_COUNT];
     private final SparseArray<LightImpl> mLightsById = new SparseArray<>();
@@ -475,6 +475,7 @@ public class LightsService extends SystemService {
     private void populateAvailableLightsFromAidl(Context context) {
         try {
             for (HwLight hwLight : mVintfLights.get().getLights()) {
+                Slog.d(TAG, "Set lightimpl from HAL:" + hwLight.id);
                 mLightsById.put(hwLight.id, new LightImpl(context, hwLight));
             }
         } catch (RemoteException ex) {
@@ -489,6 +490,7 @@ public class LightsService extends SystemService {
             hwLight.ordinal = 1;
             hwLight.type = (byte) i;
             mLightsById.put(hwLight.id, new LightImpl(context, hwLight));
+            Slog.d(TAG, "Set lightimpl from HIDL:" + hwLight.id);
         }
     }
 

@@ -309,6 +309,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntConsumer;
 
+import com.android.internal.baikalos.Runtime;
+
+import com.android.internal.baikalos.Runtime;
+
 /**
  * Service that maintains low-level network policy rules, using
  * {@link NetworkStatsService} statistics to drive those rules.
@@ -791,6 +795,11 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
         for (int uid : whitelist) {
             mPowerSaveWhitelistAppIds.put(uid, true);
         }
+	    int gmsUid = Runtime.gmsUid();
+            if( gmsUid != -1 ) {
+                mPowerSaveWhitelistExceptIdleAppIds.put(gmsUid, true);
+                mPowerSaveWhitelistAppIds.put(gmsUid, true);
+            }        
     }
 
     /**

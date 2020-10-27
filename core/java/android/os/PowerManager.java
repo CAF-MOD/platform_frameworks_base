@@ -1092,6 +1092,7 @@ public final class PowerManager {
                 com.android.internal.R.integer.config_screenBrightnessSettingDefault);
     }
 
+
     /**
      * Gets the minimum supported screen brightness setting for VR Mode.
      * @hide

@@ -51,6 +51,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import com.android.internal.R;
+import com.android.internal.baikalos.BaikalSettings;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

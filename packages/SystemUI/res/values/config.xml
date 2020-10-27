@@ -670,4 +670,26 @@
          1 - Override the setting to always bypass keyguard
          2 - Override the setting to never bypass keyguard -->
     <integer name="config_face_unlock_bypass_override">0</integer>
+
+    <!-- The SYS temperature sensor path, defaults to empty -->
+    <string name="config_sysTempSensor" translatable="false"></string>
+    <!-- The BAT temperature sensor path, defaults to empty -->
+    <string name="config_batTempSensor" translatable="false"></string>
+
+    <!-- The CPU temperature sensor path, defaults to empty -->
+    <string name="config_cpuTempSensor" translatable="false"></string>
+
+    <!-- The CPU temperature divider, if needed -->
+    <integer name="config_cpuTempDivider" translatable="false">1</integer>
+
+    <!-- The CPU temperature sensor path, defaults to empty -->
+    <string name="config_batCurrent" translatable="false"></string>
+
+    <!-- The CPU temperature sensor path, defaults to empty -->
+    <string name="config_cpuTempSensorPrefix" translatable="false"></string>
+    <!-- The CPU temperature sensor path, defaults to empty -->
+    <string name="config_cpuTempSensorSuffix" translatable="false"></string>
+    <!-- The CPU temperature sensor path, defaults to empty -->
+    <string name="config_cpuTempSensorNumber" translatable="false"></string>
+
 </resources>

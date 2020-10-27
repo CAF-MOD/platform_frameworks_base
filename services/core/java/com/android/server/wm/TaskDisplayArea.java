@@ -50,6 +50,8 @@ import android.app.ActivityOptions;
 import android.app.WindowConfiguration;
 import android.content.res.Configuration;
 import android.os.UserHandle;
+import android.os.SystemProperties;
+import android.util.BoostFramework;
 import android.util.IntArray;
 import android.util.Slog;
 import android.view.RemoteAnimationTarget;

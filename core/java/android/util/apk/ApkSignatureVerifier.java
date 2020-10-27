@@ -28,6 +28,7 @@ import android.content.pm.PackageParser.PackageParserException;
 import android.content.pm.PackageParser.SigningDetails.SignatureSchemeVersion;
 import android.content.pm.Signature;
 import android.content.pm.parsing.ParsingPackageUtils;
+import android.os.SystemProperties;
 import android.os.Build;
 import android.os.Trace;
 import android.util.jar.StrictJarFile;

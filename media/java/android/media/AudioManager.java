@@ -5539,7 +5539,7 @@ public class AudioManager {
         case STREAM_VOICE_CALL:
         case STREAM_SYSTEM:
         case STREAM_RING:
-        case STREAM_MUSIC:
+        case STREAM_MUSIC:        
         case STREAM_ALARM:
         case STREAM_NOTIFICATION:
         case STREAM_DTMF:

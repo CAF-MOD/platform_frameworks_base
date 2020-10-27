@@ -58,6 +58,7 @@ public class DozeMachine {
     private final DozeLog mDozeLog;
     private static final String REASON_CHANGE_STATE = "DozeMachine#requestState";
     private static final String REASON_HELD_FOR_STATE = "DozeMachine#heldForState";
+    private static boolean mWakelockRequired = false;
 
     public enum State {
         /** Default state. Transition to INITIALIZED to get Doze going. */
@@ -105,6 +106,8 @@ public class DozeMachine {
                 case DOZE_PULSING_BRIGHT:
                 case DOZE_AOD_DOCKED:
                     return true;
+                case DOZE_AOD:
+                    return mWakelockRequired;
                 default:
                     return false;
             }
@@ -165,6 +168,7 @@ public class DozeMachine {
         mDockManager = dockManager;
         mDozeHost = dozeHost;
         mParts = parts;
+        mWakelockRequired = mConfig.alwaysOnRequireWakelock();
         for (Part part : parts) {
             part.setDozeMachine(this);
         }
