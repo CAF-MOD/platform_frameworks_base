@@ -327,7 +327,6 @@ public class DeviceIdleController extends SystemService
     
     private boolean mAggressiveMode = false;
     private boolean mExtremeMode = false;
-    private boolean mReaderMode = false;   
 
     /**
      * Constraints are the "handbrakes" that stop the device from moving into a lower state until
@@ -375,7 +374,6 @@ public class DeviceIdleController extends SystemService
     private static final int ACTIVE_REASON_FROM_BINDER_CALL = 5;
     private static final int ACTIVE_REASON_FORCED = 6;
     private static final int ACTIVE_REASON_ALARM = 7;
-    private static final int ACTIVE_REASON_READER_MODE = 8;
     
     @VisibleForTesting
     static final int SET_IDLE_FACTOR_RESULT_UNINIT = -1;
@@ -714,20 +712,6 @@ public class DeviceIdleController extends SystemService
         }
     };
  
-     private final BroadcastReceiver mReaderModeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            synchronized (DeviceIdleController.this) {
-                String action = intent.getAction();
-                boolean mode = (boolean)intent.getExtra(com.android.internal.baikalos.Actions.EXTRA_BOOL_MODE);
-                if (mReaderMode != mode) {
-                    mReaderMode = mode;
-                    updateReaderModeLocked();
-                }
-            }
-        }
-    };   
-
     /** Post stationary status only to this listener. */
     private void postStationaryStatus(DeviceIdleInternal.StationaryListener listener) {
         mHandler.obtainMessage(MSG_REPORT_STATIONARY_STATUS, listener).sendToTarget();
@@ -2462,10 +2446,6 @@ public class DeviceIdleController extends SystemService
                 filter.addAction(Intent.ACTION_SCREEN_ON);
                 getContext().registerReceiver(mInteractivityReceiver, filter);
 
-                filter = new IntentFilter();
-                filter.addAction(com.android.internal.baikalos.Actions.ACTION_READER_MODE_CHANGED);
-                getContext().registerReceiver(mReaderModeReceiver, filter);                
-                
                 mLocalActivityManager.setDeviceIdleAllowlist(
                         mPowerSaveWhitelistAllAppIdArray, mPowerSaveWhitelistExceptIdleAppIdArray);
                 mLocalPowerManager.setDeviceIdleWhitelist(mPowerSaveWhitelistAllAppIdArray);
@@ -3111,19 +3091,6 @@ public class DeviceIdleController extends SystemService
             return mScreenOn;
         }
     }
-
-    void updateReaderModeLocked() {
-        if ( !mScreenOn ) return;
-        if (DEBUG) Slog.d(TAG, "updateReaderModeLocked: readerMode=" + mReaderMode);
-        if ( mReaderMode ) {
-            becomeInactiveIfAppropriateLocked();
-        } else {
-            if (!mScreenLocked || !mConstants.WAIT_FOR_UNLOCK) {
-                mActiveReason = ACTIVE_REASON_READER_MODE;
-                becomeActiveLocked("reader", Process.myUid());
-            }
-        }
-    }
     
     void updateInteractivityLocked() {
         // The interactivity state from the power manager tells us whether the display is
@@ -3288,7 +3255,7 @@ public class DeviceIdleController extends SystemService
         verifyAlarmStateLocked();
 
         final boolean isScreenBlockingInactive =
-                (mScreenOn && !mReaderMode) && (!mConstants.WAIT_FOR_UNLOCK || !mScreenLocked);
+                mScreenOn && (!mConstants.WAIT_FOR_UNLOCK || !mScreenLocked);
         if (DEBUG) {
             Slog.d(TAG, "becomeInactiveIfAppropriateLocked():"
                     + " isScreenBlockingInactive=" + isScreenBlockingInactive
@@ -3386,7 +3353,7 @@ public class DeviceIdleController extends SystemService
     void exitForceIdleLocked() {
         if (mForceIdle) {
             mForceIdle = false;
-            if ((mScreenOn && !mReaderMode) || mCharging) {
+            if (mScreenOn || mCharging) {
                 mActiveReason = ACTIVE_REASON_FORCED;
                 becomeActiveLocked("exit-force", Process.myUid());
             }

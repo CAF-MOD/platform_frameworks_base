@@ -78,10 +78,6 @@ public class BaikalSystemService extends SystemService {
 
     final com.android.internal.baikalos.Actions mBaikalActions;
 
-    final com.android.internal.baikalos.Bluetooth mBaikalBluetooth;
-
-    final com.android.internal.baikalos.Telephony mBaikalTelephony;
-    final com.android.internal.baikalos.Torch mBaikalTorch;
     final com.android.internal.baikalos.Sensors mBaikalSensors;
     final com.android.internal.baikalos.AppProfileManager mBaikalAppProfileManager;
     final com.android.internal.baikalos.DevProfileManager mBaikalDevProfileManager;
@@ -101,12 +97,9 @@ public class BaikalSystemService extends SystemService {
 
 
 	    mBaikalActions = new Actions(mContext,mHandler);
-	    mBaikalBluetooth = new Bluetooth();
-	    mBaikalTelephony = new Telephony();
-	    mBaikalTorch = new Torch();
 	    mBaikalSensors = new Sensors();
-        mBaikalAppProfileManager = new AppProfileManager();
-        mBaikalDevProfileManager = new DevProfileManager();
+      mBaikalAppProfileManager = new AppProfileManager();
+      mBaikalDevProfileManager = new DevProfileManager();
    }
 
 
@@ -118,12 +111,6 @@ public class BaikalSystemService extends SystemService {
         if( DEBUG ) {
             Slog.i(TAG,"onStart()");
         }
-/*
-        mBinderService = new BinderService();
-        publishBinderService(Context.BAIKAL_SERVICE_CONTROLLER, mBinderService);
-        publishLocalService(BaikalService.class, this);
-
-        readConfigFileLocked();*/
     }
 
     @Override
@@ -136,7 +123,6 @@ public class BaikalSystemService extends SystemService {
             synchronized(this) {
                 Slog.i(TAG,"onBootPhase(" + phase + "): Core BaikalOS componenets init");
                 mBaikalSettings.loadStaticConstants(mContext);
-                updateDolbyService();
 	        }
     	} else if( phase == PHASE_BOOT_COMPLETED) {
 
@@ -147,27 +133,21 @@ public class BaikalSystemService extends SystemService {
             synchronized(this) {
 
     		    mBaikalActions.initialize(mContext,mHandler);	
-    		    mBaikalBluetooth.initialize(mContext,mHandler);	
-    		    mBaikalTelephony.initialize(mContext,mHandler);	
-    		    mBaikalTorch.initialize(mContext,mHandler);	
     		    mBaikalSensors.initialize(mContext,mHandler);
-                mBaikalAppProfileManager.initialize(mContext,mHandler);
-                mBaikalDevProfileManager.initialize(mContext,mHandler);
+            mBaikalAppProfileManager.initialize(mContext,mHandler);
+            mBaikalDevProfileManager.initialize(mContext,mHandler);
 
-                mBaikalSettings = new BaikalSettings(mHandler,mContext);
-                IntentFilter topAppFilter = new IntentFilter();
-                topAppFilter.addAction(Actions.ACTION_TOP_APP_CHANGED);
-                getContext().registerReceiver(mTopAppReceiver, topAppFilter);
+           mBaikalSettings = new BaikalSettings(mHandler,mContext);
+           IntentFilter topAppFilter = new IntentFilter();
+           topAppFilter.addAction(Actions.ACTION_TOP_APP_CHANGED);
+           getContext().registerReceiver(mTopAppReceiver, topAppFilter);
 	        }
 
 	        BaikalStaticService.Initialize(mContext,
     			mBaikalActions,
-    			mBaikalBluetooth,
-                mBaikalTelephony,
-    			mBaikalTorch,
     			mBaikalSensors,
-                mBaikalAppProfileManager,
-                mBaikalDevProfileManager,
+          mBaikalAppProfileManager,
+          mBaikalDevProfileManager,
     			mBaikalSettings);
 
 
@@ -180,14 +160,6 @@ public class BaikalSystemService extends SystemService {
 
                 uid = getPackageUidLocked("com.android.vending");
                 Runtime.setGpsUid(uid);
-
-                uid = getPackageUidLocked("com.dolby.daxservice");
-                BaikalUtils.setDolbyUid(uid);
-
-
-                setPackageEnabled("com.tencent.soter.soterserver",false);
-
-                //mConstants.updateConstantsLocked();
 
             }
         }
@@ -221,9 +193,6 @@ public class BaikalSystemService extends SystemService {
 
 	    if( mBaikalActions.onMessage(msg) ) return; 
 	    if( mBaikalSensors.onMessage(msg) ) return; 
-	    if( mBaikalTelephony.onMessage(msg) ) return; 
-	    if( mBaikalBluetooth.onMessage(msg) ) return; 
-	    if( mBaikalTorch.onMessage(msg) ) return; 
         }
     }
 
@@ -233,23 +202,6 @@ public class BaikalSystemService extends SystemService {
 
         public MyHandlerThread() {
             super("baikal.handler", android.os.Process.THREAD_PRIORITY_FOREGROUND);
-        }
-    }
-
-    private void updateDolbyService() {
-        Boolean isDolbyAvail = SystemProperties.getBoolean("persist.baikal.dolby.enable",false);
-        if( DEBUG ) Slog.i(TAG,"updateDolbyService isDolbyAvail=" + isDolbyAvail);
-        updateDolbyConfiguration(isDolbyAvail);
-    }
-
-    private void updateDolbyConfiguration(boolean enabled) {
-
-        if( !enabled ) {
-            setPackageEnabled("com.motorola.dolby.dolbyui",false);
-            setPackageEnabled("com.dolby.daxservice",false);
-        } else {
-            setPackageEnabled("com.motorola.dolby.dolbyui",true);
-            setPackageEnabled("com.dolby.daxservice",true);
         }
     }
 

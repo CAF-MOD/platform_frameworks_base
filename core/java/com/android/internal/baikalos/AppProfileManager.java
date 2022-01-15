@@ -25,7 +25,6 @@ import android.os.PowerManager;
 import android.os.SystemProperties;
 import android.os.Process;
 import android.os.SystemProperties;
-import android.util.BoostFramework;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;

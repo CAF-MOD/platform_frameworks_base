@@ -85,9 +85,6 @@ public class BaikalStaticService {
     private static Context mContext;
 
     static com.android.internal.baikalos.Actions mBaikalActions;
-    static com.android.internal.baikalos.Bluetooth mBaikalBluetooth;
-    static com.android.internal.baikalos.Telephony mBaikalTelephony;
-    static com.android.internal.baikalos.Torch mBaikalTorch;
     static com.android.internal.baikalos.Sensors mBaikalSensors;
     static com.android.internal.baikalos.AppProfileManager mBaikalAppProfileManager;
     static com.android.internal.baikalos.DevProfileManager mBaikalDevProfileManager;
@@ -100,9 +97,6 @@ public class BaikalStaticService {
 
     static void Initialize(Context context,
 	    com.android.internal.baikalos.Actions baikalActions,
-	    com.android.internal.baikalos.Bluetooth baikalBluetooth,
-	    com.android.internal.baikalos.Telephony baikalTelephony,
-	    com.android.internal.baikalos.Torch baikalTorch,
 	    com.android.internal.baikalos.Sensors baikalSensors,
 	    com.android.internal.baikalos.AppProfileManager baikalAppProfileManager,
 	    com.android.internal.baikalos.DevProfileManager baikalDevProfileManager,
@@ -114,12 +108,9 @@ public class BaikalStaticService {
         }
 
 	    mBaikalActions = baikalActions;
-	    mBaikalBluetooth = baikalBluetooth;
-	    mBaikalTelephony = baikalTelephony;
-	    mBaikalTorch = baikalTorch;
 	    mBaikalSensors = baikalSensors;
-        mBaikalAppProfileManager = baikalAppProfileManager;
-        mBaikalDevProfileManager = baikalDevProfileManager;
+      mBaikalAppProfileManager = baikalAppProfileManager;
+      mBaikalDevProfileManager = baikalDevProfileManager;
 	    mBaikalSettings = baikalSettings;
     }
 
@@ -170,12 +161,6 @@ public class BaikalStaticService {
             
         return false;
     }
-
-    //boolean updateSingleJobRestrictionLocked(boolean canRun, JobStatus jobStatus, int activeState) {
-    //    final int uid = jobStatus.getSourceUid();
-    //    final String packageName = jobStatus.getSourcePackageName();
-    //    return canRun;
-    //}
 
     public static boolean updateSingleJobRestrictionLocked(boolean canRun, int uid, String packageName, int activeState, JobInfo jobInfo) {
         if( !BaikalSettings.getStaminaMode() &&

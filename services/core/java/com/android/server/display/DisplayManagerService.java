@@ -300,6 +300,8 @@ public final class DisplayManagerService extends SystemService {
                 requestDisplayStateInternal(displayId, state, brightness, sdrBrightness);
             }
 
+            mDisplayPowerCallbacks.onDisplayChange(state);
+            
             if (stateChanged) {
                 mDisplayPowerCallbacks.onDisplayStateChange(allInactive, allOff);
             }

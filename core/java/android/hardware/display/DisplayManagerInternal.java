@@ -518,6 +518,7 @@ public abstract class DisplayManagerInternal {
         void onStateChanged();
         void onProximityPositive();
         void onProximityNegative();
+        void onDisplayChange(int state); // one of the Display state constants        
         void onDisplayStateChange(boolean allInactive, boolean allOff);
 
         void acquireSuspendBlocker();
